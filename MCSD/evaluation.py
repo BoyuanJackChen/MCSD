@@ -131,6 +131,7 @@ def main(args):
 
     logger.info("Loading target model: {}".format(args.target_model))
     target_model = LlamaForCausalLM.from_pretrained(
+    # target_model = ModelLoader.from_pretrained(
         args.target_model,
         torch_dtype=torch_dtype,
         device_map="auto",
@@ -152,14 +153,16 @@ def main(args):
         disable_tqdm=args.disable_tqdm,
     )
 
-
+# "JackFram/llama-68m"
+# "lmsys/vicuna-13b-v1.5"
+    
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--draft-model", type=str, required=True, help="Draft model path."
+        "--draft-model", type=str, default="WizardLM/WizardCoder-1B-V1.0", help="Draft model path."
     )
     parser.add_argument(
-        "--target-model", type=str, required=True, help="Target model path."
+        "--target-model", type=str, default="WizardLM/WizardCoder-15B-V1.0", help="Target model path."
     )
     parser.add_argument("--tokenizer", type=str, default=None, help="Tokenizer path.")
     parser.add_argument("--fp16", action="store_true", help="use float16 dtype.")
@@ -167,12 +170,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--k-config",
         type=lambda x: tuple(map(int, x.split(","))),
-        required=True,
+        default=(4,2,1,1),
         help="Use comma separations, e.g. `--k-config 4,2,2`.",
     )
 
     parser.add_argument(
-        "--datapath", type=str, required=True, help="The json data file."
+        "--datapath", type=str, default="../dataset/code_questions.json", help="The json data file."
     )
     parser.add_argument("--max-new-tokens", type=int, default=128)
     parser.add_argument(
@@ -194,7 +197,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--disable-tqdm", action="store_true")
 
-    parser.add_argument("--auto-model", action="store_true")
+    parser.add_argument("--auto-model", type=bool, default=True)
 
     args = parser.parse_args()
 
